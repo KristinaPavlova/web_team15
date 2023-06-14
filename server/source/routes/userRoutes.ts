@@ -17,26 +17,6 @@ const userSchema: JSONSchemaType<{
   additionalProperties: true,
 };
 
-// Note JSON schema
-const noteSchema: JSONSchemaType<{
-  title: string;
-  content: string;
-  username: string;
-  created: number;
-  last_modified: number;
-}> = {
-  type: 'object',
-  properties: {
-    title: { type: 'string' },
-    content: { type: 'string' },
-    username: { type: 'string' },
-    created: { type: 'integer'},
-    last_modified: { type: 'integer'},
-  },
-  required: ['title', 'content', 'username', 'created', 'last_modified'],
-  additionalProperties: true,
-};
-
 // Request validation middleware
 const validateRequest = <T>(schema: JSONSchemaType<T>) => {
   const ajv = new Ajv();
@@ -92,15 +72,4 @@ userRouter.get('/exists', (req: Request, res: Response) => {
   } else {
     res.json({ message: 'User does not exist.' });
   }
-});
-
-// Create note endpoint
-userRouter.post('/notes', validateRequest(noteSchema), (req: Request, res: Response) => {
-  // Handle note creation logic
-  // Access the validated request body using req.body
-  const { title, content, username, created, last_modified } = req.body;
-  // Perform necessary operations to create a note
-
-  // Return success response
-  res.status(200).json({ message: 'Note created.' });
 });
