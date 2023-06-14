@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "tsc && node server.js",
-    "dev": "ts-node server.ts"
+    "start": "tsc && node index.js",
+    "dev": "ts-node index.ts"
   },
   "keywords": [],
   "author": "",

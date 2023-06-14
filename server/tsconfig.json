@@ -1,9 +1,11 @@
 {
     "compilerOptions": {
-        "esModuleInterop": true,
+      "moduleResolution": "node",
+      "esModuleInterop": true,
       "target": "es6",
       "module": "commonjs",
-      "strict": true
+      "strict": true,
+      "sourceMap": true
     },
     "include": [
       "source"
