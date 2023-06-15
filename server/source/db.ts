@@ -1,32 +1,29 @@
-import sql, { ConnectionPool } from 'mssql';
+import { ConnectionPool } from 'mssql';
 
-let connectionPool: ConnectionPool;
+let connection: ConnectionPool;
 
 export const connectToDatabase = async (): Promise<ConnectionPool> => {
-  if (connectionPool) {
-    return connectionPool;
+  if (connection) {
+    return connection;
   }
 
   try {
-    const config = {
-      user: 'sa',
-      password: 'Pesho',
-      server: '192.168.192.110:1433',
-      database: 'Library',
+    connection = new ConnectionPool({
+      user: 'sa1',
+      password: 'sa',
+      server: '192.168.192.110',
+      database: 'NotesInCloud',
       options: {
-        encrypt: false, // For secure connection, enable encryption
-      },
-    };
+        encrypt: false,
+      }
+    });
 
-    connectionPool = await sql.connect(config);
+    await connection.connect();
+
     console.log('Connected to the database');
-    return connectionPool;
+    return connection;
   } catch (error) {
     console.error('Failed to connect to the database:', error);
     throw error;
   }
 };
-//host: 192.168.192.110:1433
-//username:sa
-//password:Pesho
-//db_name: Library
