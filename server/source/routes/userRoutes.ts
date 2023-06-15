@@ -85,13 +85,13 @@ userRouter.get('/exists', async (req: Request, res: Response) => {
     // Set up the SQL query to check user existence with parameters
     userCheckRequest.input('username', username);
     userCheckRequest.input('password', password);
-    const userCheckQuery = `SELECT COUNT(*) AS userCount FROM Users WHERE username = @username AND password = @password;`;
+    const userCheckQuery = `SELECT COUNT(*) AS UserCount FROM Users WHERE Username = @username AND Password = @password;`;
 
     // Execute the user check query
     const userCheckResult = await userCheckRequest.query(userCheckQuery);
 
     // Check if the user exists
-    const userExists = userCheckResult.recordset[0].userCount > 0;
+    const userExists = userCheckResult.recordset[0].UserCount > 0;
 
     if (userExists) {
       // User exists, proceed to select titles and creations from notes
@@ -99,7 +99,7 @@ userRouter.get('/exists', async (req: Request, res: Response) => {
 
       // Set up the SQL query to select titles and creations from notes with the given username
       notesRequest.input('username', username);
-      const notesQuery = `SELECT title, creationDate FROM notes WHERE username = @username;`;
+      const notesQuery = `SELECT Title, Creation_Date FROM notes WHERE Username_FK = @username;`;
 
       // Execute the notes query
       const notesResult = await notesRequest.query(notesQuery);

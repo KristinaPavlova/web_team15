@@ -111,7 +111,7 @@ noteRouter.delete('/', async(req: Request, res: Response) => {
     // Set up the SQL query to delete the note from the "notes" table with parameters
     deleteRequest.input('title', title);
     deleteRequest.input('username', username);
-    const deleteQuery = `DELETE FROM notes WHERE title = @title AND username = @username;`;
+    const deleteQuery = `DELETE FROM Notes WHERE Title = @title AND Username_FK = @username;`;
 
     // Execute the delete query
     await deleteRequest.query(deleteQuery);
