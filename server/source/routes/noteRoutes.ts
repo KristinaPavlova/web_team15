@@ -54,24 +54,24 @@ noteRouter.post('/', validateRequest(noteSchema), (req: Request, res: Response) 
     const { title, content, username, created, last_modified } = req.body;
     // Perform necessary operations to create a note
 
-    try {
-        const connection = connectToDatabase();
-        const query = 'INSERT INTO Notes (Title, Content, Username, CreateDate, LastModified) VALUES (?, ?, ?, ?, ?)';
-        const values = [title, content, username, created, last_modified];
+    // try {
+    //     const connection = connectToDatabase();
+    //     const query = 'INSERT INTO Notes (Title, Content, Username, CreateDate, LastModified) VALUES (?, ?, ?, ?, ?)';
+    //     const values = [title, content, username, created, last_modified];
 
-        connection.query(query, values, (error) => {
-            if (error) {
-                console.error('Failed to create note:', error);
-                return res.status(500).json({ error: 'Failed to create note.' });
-            }
+    //     connection.query(query, values, (error) => {
+    //         if (error) {
+    //             console.error('Failed to create note:', error);
+    //             return res.status(500).json({ error: 'Failed to create note.' });
+    //         }
 
-            console.log('Note created.');
-            return res.status(200).json({ message: 'Note created.' });
-        });
-    } catch (error) {
-        console.error('Failed to connect to the database:', error);
-        return res.status(500).json({ error: 'Failed to create note.' });
-    }
+    //         console.log('Note created.');
+    //         return res.status(200).json({ message: 'Note created.' });
+    //     });
+    // } catch (error) {
+    //     console.error('Failed to connect to the database:', error);
+    //     return res.status(500).json({ error: 'Failed to create note.' });
+    // }
 });
 
 // Get note information endpoint

@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 // Connect to the database
-//connectToDatabase();
+// connectToDatabase();
 
 // Routes
 app.use('/users', userRouter);
