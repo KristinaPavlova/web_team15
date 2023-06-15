@@ -116,14 +116,39 @@ noteRouter.get('/', async(req: Request, res: Response) => {
 });
 
 // Update note endpoint
-noteRouter.put('/', validateRequest(noteSchema), (req: Request, res: Response) => {
-    const { title, content, username, created, last_modified } = req.body;
-  
-    // Perform necessary operations to update the note with the given noteId
-    // Here you can update the note in the database or data store based on the provided noteId
-  
+// Update note endpoint
+noteRouter.put('/', validateRequest(noteSchema), async (req: Request, res: Response) => {
+  const { title, content, username, created, last_modified } = req.body;
+
+  try {
+    const db = await connectToDatabase(); // Connect to the database
+    const updateRequest = new MSSQLRequest(db); // Create a new request object
+
+    // Set up the SQL query to update the note in the "notes" table with parameters
+    updateRequest.input('title', title);
+    updateRequest.input('content', content);
+    updateRequest.input('username', username);
+    updateRequest.input('created', created);
+    updateRequest.input('last_modified', last_modified);
+    const updateQuery = `
+      UPDATE Notes
+      SET Title = @title, Content = @content, Last_Modified_Date = @last_modified
+      WHERE Username_FK = @username AND Creation_Date = @created;
+    `;
+
+    // Execute the update query
+    const result = await updateRequest.query(updateQuery);
+
+    if (result.rowsAffected[0] === 0) {
+      return res.status(404).json({ error: 'Note not found.' });
+    }
+
     res.status(200).json({ message: `Note updated.` });
-  });
+  } catch (error) {
+    console.error('Failed to update the note:', error);
+    res.status(500).json({ error: 'Failed to update the note.' });
+  }
+});
 
 // Delete note endpoint
 noteRouter.delete('/', async(req: Request, res: Response) => {
