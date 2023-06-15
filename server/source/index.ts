@@ -9,7 +9,10 @@ const app = express();
 app.use(bodyParser.json());
 
 // Connect to the database
-// connectToDatabase();
+// connectToDatabase().catch((error) => {
+//   console.error('Failed to connect to the database:', error);
+//   process.exit(1);
+// });
 
 // Routes
 app.use('/users', userRouter);
