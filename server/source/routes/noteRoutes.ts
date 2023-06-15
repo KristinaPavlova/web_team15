@@ -4,20 +4,21 @@ import { ConnectionPool, Request as MSSQLRequest } from 'mssql';
 import { connectToDatabase } from '../db';
 
 // Note JSON schema
+// Note JSON schema
 const noteSchema: JSONSchemaType<{
   title: string;
   content: string;
   username: string;
-  created: number;
-  last_modified: number;
+  created: string; // Change the type to string for date-time value
+  last_modified: string; // Change the type to string for date-time value
 }> = {
   type: 'object',
   properties: {
     title: { type: 'string' },
     content: { type: 'string' },
     username: { type: 'string' },
-    created: { type: 'number' },
-    last_modified: { type: 'number' },
+    created: { type: 'string'}, // Add format 'date-time' for date-time value
+    last_modified: { type: 'string'}, // Add format 'date-time' for date-time value
   },
   required: ['title', 'content', 'username', 'created', 'last_modified'],
   additionalProperties: false,
@@ -49,16 +50,34 @@ const validateRequest = <T>(schema: JSONSchemaType<T>) => {
 export const noteRouter = express.Router();
 
 // Create note endpoint
-noteRouter.post('/', validateRequest(noteSchema), (req: Request, res: Response) => {
-    // Handle note creation logic
-    // Access the validated request body using req.body
-    const { title, content, username, created, last_modified } = req.body;
-    // Perform necessary operations to create a note
-    
+noteRouter.post('/', validateRequest(noteSchema), async (req: Request, res: Response) => {
+  // Access the validated request body using req.body
+  const { title, content, username, created, last_modified } = req.body;
+
+  try {
+    const db = await connectToDatabase(); // Connect to the database
+    const insertRequest = new MSSQLRequest(db); // Create a new request object
+
+    // Set up the SQL query to insert the note into the "notes" table with parameters
+    insertRequest.input('title', title);
+    insertRequest.input('content', content);
+    insertRequest.input('username', username);
+    insertRequest.input('created', created);
+    insertRequest.input('last_modified', last_modified);
+    const insertQuery = `INSERT INTO Notes (Title, Content, Username_FK, Creation_Date, Last_Modified_Date) VALUES (@title, @content, @username, @created, @last_modified);`;
+
+    // Execute the insert query
+    await insertRequest.query(insertQuery);
+
+    res.status(200).json({ message: 'Note created.' });
+  } catch (error) {
+    console.error('Failed to create the note:', error);
+    res.status(500).json({ error: 'Failed to create the note.' });
+  }  
 });
 
 // Get note information endpoint
-noteRouter.get('/', (req: Request, res: Response) => {
+noteRouter.get('/', async(req: Request, res: Response) => {
   const { title, username } = req.query;
 
   // Validate query parameters
@@ -68,19 +87,32 @@ noteRouter.get('/', (req: Request, res: Response) => {
       .json({ error: 'Invalid query parameters. Both title and username are required.' });
   }
 
-  // Perform necessary operations to retrieve note information
-  // Here you can query the database or data store based on the provided title and username
+  try {
+    const db = await connectToDatabase(); // Connect to the database
+    const selectRequest = new MSSQLRequest(db); // Create a new request object
 
-  // For demonstration purposes, we assume the note exists
-  const note = {
-    title,
-    content: 'Note content',
-    username,
-    created: Date.now(),
-    last_modified: Date.now(),
-  };
+    // Set up the SQL query to select the note from the "notes" table
+    selectRequest.input('title', title);
+    selectRequest.input('username', username);
+    const selectQuery = `
+      SELECT Title, Content, Creation_Date, Last_Modified_Date
+      FROM Notes
+      WHERE Title = @title AND Username_FK = @username;
+    `;
 
-  res.status(200).json(note);
+    // Execute the select query
+    const result = await selectRequest.query(selectQuery);
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ error: 'Note not found.' });
+    }
+
+    const note = result.recordset[0];
+    res.status(200).json(note);
+  } catch (error) {
+    console.error('Failed to retrieve the note:', error);
+    res.status(500).json({ error: 'Failed to retrieve the note.' });
+  }
 });
 
 // Update note endpoint
