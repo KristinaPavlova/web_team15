@@ -1,5 +1,6 @@
 import express, { Request, Response, NextFunction } from 'express';
 import Ajv, { JSONSchemaType } from 'ajv';
+import { ConnectionPool, Request as MSSQLRequest } from 'mssql';
 import { connectToDatabase } from '../db';
 
 // Note JSON schema
@@ -15,14 +16,14 @@ const noteSchema: JSONSchemaType<{
     title: { type: 'string' },
     content: { type: 'string' },
     username: { type: 'string' },
-    created: { type: 'integer' },
-    last_modified: { type: 'integer' },
+    created: { type: 'number' },
+    last_modified: { type: 'number' },
   },
   required: ['title', 'content', 'username', 'created', 'last_modified'],
-  additionalProperties: true,
+  additionalProperties: false,
 };
 
-// Request validation middleware
+// Request validationinteger middleware
 const validateRequest = <T>(schema: JSONSchemaType<T>) => {
   const ajv = new Ajv();
   const validate = ajv.compile(schema);
@@ -53,25 +54,7 @@ noteRouter.post('/', validateRequest(noteSchema), (req: Request, res: Response) 
     // Access the validated request body using req.body
     const { title, content, username, created, last_modified } = req.body;
     // Perform necessary operations to create a note
-
-    // try {
-    //     const connection = connectToDatabase();
-    //     const query = 'INSERT INTO Notes (Title, Content, Username, CreateDate, LastModified) VALUES (?, ?, ?, ?, ?)';
-    //     const values = [title, content, username, created, last_modified];
-
-    //     connection.query(query, values, (error) => {
-    //         if (error) {
-    //             console.error('Failed to create note:', error);
-    //             return res.status(500).json({ error: 'Failed to create note.' });
-    //         }
-
-    //         console.log('Note created.');
-    //         return res.status(200).json({ message: 'Note created.' });
-    //     });
-    // } catch (error) {
-    //     console.error('Failed to connect to the database:', error);
-    //     return res.status(500).json({ error: 'Failed to create note.' });
-    // }
+    
 });
 
 // Get note information endpoint
@@ -111,19 +94,32 @@ noteRouter.put('/', validateRequest(noteSchema), (req: Request, res: Response) =
   });
 
 // Delete note endpoint
-noteRouter.delete('/', (req: Request, res: Response) => {
-    const { title, username } = req.query;
-  
-    // Validate query parameters
-    if (typeof title !== 'string' || typeof username !== 'string') {
-      return res
-        .status(400)
-        .json({ error: 'Invalid query parameters. Both title and username are required.' });
-    }
-  
-    // Perform necessary operations to delete the note
-    // Here you can delete the note from the database or data store based on the provided title and username
-  
+noteRouter.delete('/', async(req: Request, res: Response) => {
+  const { title, username } = req.query;
+
+  // Validate query parameters
+  if (typeof title !== 'string' || typeof username !== 'string') {
+    return res
+      .status(400)
+      .json({ error: 'Invalid query parameters. Both title and username are required.' });
+  }
+
+  try {
+    const db = await connectToDatabase(); // Connect to the database
+    const deleteRequest = new MSSQLRequest(db); // Create a new request object
+
+    // Set up the SQL query to delete the note from the "notes" table with parameters
+    deleteRequest.input('title', title);
+    deleteRequest.input('username', username);
+    const deleteQuery = `DELETE FROM notes WHERE title = @title AND username = @username;`;
+
+    // Execute the delete query
+    await deleteRequest.query(deleteQuery);
+
     res.status(200).json({ message: 'Note deleted.' });
+  } catch (error) {
+    console.error('Failed to delete the note:', error);
+    res.status(500).json({ error: 'Failed to delete the note.' });
+  }
   });
   
