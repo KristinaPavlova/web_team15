@@ -1,0 +1,69 @@
+<body>
+
+    <header>
+        <div>
+            <h1>Notes in the cloud</h1>
+        </div>
+        <div class="login-panel">
+            <!--<button class="login-btn">Log in | Sign up</button>-->
+            <p class="usernameName">{{user.username}} 👤 </p>
+            <button class="logOutBtn" (click)="logOut()">Log Out</button>
+        </div>
+
+    </header>
+    <div class="container">
+        <div class="add-note">
+            <h2>Create a New Note</h2>
+            <form ngNativeValidate class="input_form" (ngSubmit)="crateNote()">
+                <label for="note-title">Title:</label>
+                <input type="text" id="note-title" name="note-title" [(ngModel)]="createNote.title"><br>
+
+                <label for="note-content">Content:</label>
+                <textarea id="note-content" name="note-content" [(ngModel)]="createNote.content" required></textarea><br>
+
+                <button type="submit">Save Note</button>
+            </form>
+        </div>
+        <div class="notes">
+            <h2>Previously Created Notes</h2>
+
+            <div class="section">
+                <ul>
+                    <li *ngFor="let note of notes">
+                        <div class="title-and-delete-container">
+                            <h3>{{ note.Title }}</h3>
+                            <button (click)="deleteNode(note)">❌</button>
+                        </div>
+                        <p>Creation date</p>
+                        <p style="margin-top: 0px;">{{ note.Creation_Date | dateFormatter}}</p>
+                        <div class="edit-btn-container">
+                            <button class="note-edit-btn" (click)="openEditNote(note)">View</button>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="container-modal" class="modal">
+        <section class="edit-note">
+            <h2>Note</h2>
+            <form class="input_form">
+                <div class="form-group">
+                    <p id="dateEditForm"></p>
+                </div>
+                <div class="form-group">
+                    <label for="note-content-title">Title:</label>
+                    <textarea id="note-content-name" name="note-content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="note-content">Content:</label>
+                    <textarea id="note-content-text" name="note-content" required></textarea>
+                </div>
+                <div class="form-group">
+                    <button id="edit-button-save-changes" type="submit" class="button primary" (click)="editNote()">Save Changes</button>
+                    <button type="reset" class="button" (click)="closeEditNote()">Cancel</button>
+                </div>
+            </form>
+        </section>
+    </div>
+</body>
