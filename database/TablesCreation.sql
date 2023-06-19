@@ -5,7 +5,7 @@ CREATE TABLE Users (
 );
 
 CREATE TABLE Notes (
-  Title VARCHAR(50),
+  Title VARCHAR(50) UNIQUE NOT NULL,
   Content TEXT,
   Creation_Date DATETIME NOT NULL,
   Last_Modified_Date DATETIME NOT NULL,
