@@ -1,0 +1,26 @@
+<body>
+    <div class="container">
+        <div class="card signup">
+            <h2>Sign Up</h2>
+            <form ngNativeValidate id="signup-form" (ngSubmit)="register()">
+                <div class="form-group">
+                    <label for="name">Username:</label>
+                    <input type="text" id="signup-name" name="name" [(ngModel)]="user.username" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email address:</label>
+                    <input type="email" id="signup-email" name="email" [(ngModel)]="user.email" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="signup-password" name="password" [(ngModel)]="user.password" required>
+                </div>
+                <button type="submit" class="btn">Sign Up</button>
+            </form>
+            <div class="card-footer">
+                <p>Already have an account? <a id="login-link" (click)="openLogin()">Log In</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+
