@@ -11,7 +11,7 @@ export const connectToDatabase = async (): Promise<ConnectionPool> => {
     connection = new ConnectionPool({
       user: 'sa1',
       password: 'sa',
-      server: '192.168.192.110',
+      server: '10.108.6.194',
       database: 'NotesInCloud',
       options: {
         encrypt: false,

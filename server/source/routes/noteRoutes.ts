@@ -42,6 +42,18 @@ const validateRequest = <T>(schema: JSONSchemaType<T>) => {
       return res.status(400).json({ error: 'Invalid request body.' });
     }
 
+    const { title, content, username, created, last_modified } = req.body as {
+      title?: string;
+      content?: string;
+      username?: string;
+      created?: string;
+      last_modified?: string;
+    };
+
+    if (!title || !content || !username || !created || !last_modified) {
+      return res.status(400).json({ error: 'Invalid request body. All properties must be provided and not empty.' });
+    }
+
     next();
   };
 };
@@ -81,7 +93,7 @@ noteRouter.get('/', async(req: Request, res: Response) => {
   const { title, username } = req.query;
 
   // Validate query parameters
-  if (typeof title !== 'string' || typeof username !== 'string') {
+  if (!title || !username || typeof title !== 'string' || typeof username !== 'string') {
     return res
       .status(400)
       .json({ error: 'Invalid query parameters. Both title and username are required.' });
@@ -155,7 +167,7 @@ noteRouter.delete('/', async(req: Request, res: Response) => {
   const { title, username } = req.query;
 
   // Validate query parameters
-  if (typeof title !== 'string' || typeof username !== 'string') {
+  if (!title || !username || typeof title !== 'string' || typeof username !== 'string') {
     return res
       .status(400)
       .json({ error: 'Invalid query parameters. Both title and username are required.' });

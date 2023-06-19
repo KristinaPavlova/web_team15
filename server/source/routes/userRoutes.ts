@@ -25,7 +25,7 @@ const validateRequest = <T>(schema: JSONSchemaType<T>) => {
 
   return (req: Request, res: Response, next: NextFunction) => {
     if (req.method !== 'POST') {
-      return res.status(400).json({ error: 'Invalid request method.' });
+      return res.status(405).json({ error: 'Invalid request method.' });
     }
 
     if (!req.is('application/json')) {
@@ -34,6 +34,16 @@ const validateRequest = <T>(schema: JSONSchemaType<T>) => {
 
     if (!validate(req.body)) {
       return res.status(400).json({ error: 'Invalid request body.' });
+    }
+
+    const { username, password, email } = req.body as {
+      username?: string;
+      password?: string;
+      email?: string;
+    };
+
+    if (!username || !password || !email) {
+      return res.status(400).json({ error: 'Invalid request body. All properties must be provided and not empty.' });
     }
 
     next();
@@ -74,7 +84,7 @@ userRouter.post('/', validateRequest(userSchema), async (req: Request, res: Resp
 userRouter.get('/exists', async (req: Request, res: Response) => {
   const { username, password } = req.query;
 
-  if (typeof username !== 'string' || typeof password !== 'string') {
+  if (!username || !password || typeof username !== 'string' || typeof password !== 'string') {
     return res.status(400).json({ error: 'Invalid query parameters. Both username and password are required.' });
   }
 
