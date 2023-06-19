@@ -6,14 +6,15 @@ import { connectToDatabase } from './db';
 
 // Express app setup
 const app = express();
+
+app.use(function (req, res, next) {
+  res.header('Access-Control-Allow-Origin', 'http://localhost:4200');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+  next();
+});
+
 app.use(bodyParser.json());
-
-// Connect to the database
-// connectToDatabase().catch((error) => {
-//   console.error('Failed to connect to the database:', error);
-//   process.exit(1);
-// });
-
 // Routes
 app.use('/users', userRouter);
 app.use('/notes', noteRouter);
